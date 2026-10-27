@@ -11,27 +11,6 @@ public class code {
 		System.out.print("Enter the second number: ");
 		double second = scanner.nextDouble();
 
-		switch (operator) {
-			case '+':
-				System.out.println("Result: " + (first + second));
-				break;
-			case '-':
-				System.out.println("Result: " + (first - second));
-				break;
-			case '*':
-				System.out.println("Result: " + (first * second));
-				break;
-			case '/':
-				if (second == 0) {
-					System.out.println("Cannot divide by zero.");
-				} else {
-					System.out.println("Result: " + (first / second));
-				}
-				break;
-			default:
-				System.out.println("Invalid operator.");
-		}
-
 		scanner.close();
 	}
 }

@@ -1,0 +1,264 @@
+DEVOPS LAB - EXPERIMENTS 1 TO 5 Commands and steps compiled from Devops
+1-5.pdf
+
+IMPORTANT - Replace placeholders such as YOUR_GITHUB_USERNAME, REPO_URL,
+and Slack/Jenkins values with your own. - Run commands in the
+folder/project specified. - The PDF does not include every required
+source file or configuration value. Where needed, a minimal working
+example is provided and marked as an example. - Experiment 2 below
+follows the PDF’s JSON-reading program. The XML-reading addition from
+our chat is not part of the PDF experiment.
+
+============================================================ EXPERIMENT
+1: SOURCE CODE MANAGEMENT AND COLLABORATION USING GIT
+============================================================
+
+A. Create a project 1. Create a folder and open it in Visual Studio
+Code. 2. Create a file named calc.py with this code:
+
+def calci(a, b): return a + b
+
+print(calci(5, 6))
+
+B. Initialize Git and commit the first version Open the VS Code terminal
+in the project folder and run:
+
+git init git add . git commit -m “Initial commit” git branch
+
+C. Create and work on branch b1 git switch -c b1
+
+Edit calc.py so the function returns a + b, then use:
+
+print(calci(3, 4))
+
+Save and commit:
+
+git add . git commit -m “Update addition function on b1”
+
+D. Create and work on branch b2 git switch master
+
+If your default branch is named main instead of master, use: git switch
+main
+
+Create the second branch (use the branch name from the command that
+succeeded above):
+
+git switch -c b2
+
+Modify calc.py to subtract instead:
+
+def calci(a, b): return a - b
+
+print(calci(4, 3))
+
+Save and commit:
+
+git add . git commit -m “Change function to subtraction on b2”
+
+E. Merge the branches Switch back to the main branch:
+
+git switch master
+
+If your main branch is named main, use: git switch main
+
+Merge b1:
+
+git merge b1
+
+Then merge b2:
+
+git merge b2
+
+If Git reports a merge conflict: 1. Open the conflicted file. 2. Choose
+or combine the desired lines and remove conflict markers: <<<<<<<
+======= >>>>>>> 3. Save the file and run:
+
+git add . git commit -m “Resolve merge conflict”
+
+Check the history:
+
+git log –oneline –graph –all
+
+NOTE: The PDF’s branch/merge instructions are brief. A conflict is not
+guaranteed; Git only asks you to resolve one if the edits actually
+conflict. If your Git uses ‘main’, use ‘main’ consistently instead of
+‘master’.
+
+============================================================ EXPERIMENT
+2: AUTOMATED BUILD AND DEPENDENCY MANAGEMENT USING APACHE MAVEN
+============================================================
+
+A. Create a Maven project in Eclipse 1. File > New > Maven Project. 2.
+Use catalog: Internal. 3. Select the quickstart archetype shown in the
+lab instructions. 4. Set Group Id to: lab 5. Set Artifact Id to: exp2 6.
+Finish.
+
+B. Add JSON Simple dependency to pom.xml Inside the section, add this
+dependency (if it is not already present):
+
+com.googlecode.json-simple json-simple 1.1.1
+
+C. Create the JSON file Create a folder named JSON at the project
+working directory and create: JSON/student.json
+
+Example contents:
+
+{ “firstname”: “John”, “lastname”: “Doe” }
+
+D. Create the Java class In src/main/java (or the source folder used by
+your project), create readjson.java. Use the package declaration that
+matches your project. Example:
+
+package devops.devops_maven;
+
+import java.io.FileReader; import org.json.simple.JSONObject; import
+org.json.simple.parser.JSONParser;
+
+public class readjson { public static void main(String[] args) throws
+Exception { JSONObject student = (JSONObject) new JSONParser().parse(
+new FileReader(“.\JSON\student.json”));
+System.out.println(“Firstname:” + student.get(“firstname”));
+System.out.println(“Lastname:” + student.get(“lastname”)); } }
+
+IMPORTANT: - The package name in the first line must match the package
+in your project. - The relative file path is resolved from the program’s
+working directory. If the file is not found, correct the path or set the
+working directory to the project folder. - If your project uses
+src/test/java as in the handwritten notes, put the class there and run
+it using your IDE’s available run configuration. For a normal Maven
+application, src/main/java is the conventional location.
+
+E. Run and build In Eclipse, right-click the project > Maven > Update
+Project, then run readjson. To build/package from the project folder:
+
+mvn clean package
+
+Expected output for the example JSON: Firstname: John Lastname: Doe
+
+============================================================ EXPERIMENT
+3: APPLICATION CONTAINERIZATION USING DOCKER
+============================================================
+
+A. Prepare the folder 1. Open Docker Desktop and sign in to Docker Hub.
+2. Create a folder named Docker. 3. Open that folder in VS Code. 4.
+Create a file named Dockerfile (no extension) with:
+
+FROM httpd:latest COPY index.html /usr/local/apache2/htdocs/
+
+5.  Create index.html in the same folder. Minimal working example:
+
+<!DOCTYPE html>
+My Resume
+My Resume
+Name: Your Name
+Course: Your Course
+Skills: Your Skills
+Replace the example details with your own resume content.
+
+B. Build the Docker image Run these commands in the Docker folder:
+
+docker build -t YOUR_DOCKERHUB_USERNAME/resume-pc1 . docker run -d –name
+resume-container -p 9092:80 YOUR_DOCKERHUB_USERNAME/resume-pc1
+
+Open this in your browser: http://localhost:9092
+
+C. Tag and push the image to Docker Hub Make sure you are signed in:
+
+docker login docker push YOUR_DOCKERHUB_USERNAME/resume-pc1
+
+If your image needs a separate tag first, run:
+
+docker tag YOUR_DOCKERHUB_USERNAME/resume-pc1
+YOUR_DOCKERHUB_USERNAME/resume-pc1:latest docker push
+YOUR_DOCKERHUB_USERNAME/resume-pc1:latest
+
+D. Pull and run the image On a machine with Docker installed:
+
+docker pull YOUR_DOCKERHUB_USERNAME/resume-pc1:latest docker run -d
+–name resume-container-2 -p 9093:80
+YOUR_DOCKERHUB_USERNAME/resume-pc1:latest
+
+Open: http://localhost:9093
+
+Useful cleanup commands:
+
+docker ps docker stop resume-container docker rm resume-container
+
+============================================================ EXPERIMENT
+4: CONTINUOUS INTEGRATION PIPELINE AUTOMATION USING JENKINS
+============================================================
+
+A. Create a simple Java program in GitHub 1. Create a GitHub repository.
+2. Add a file named Simple.java with:
+
+public class Simple { public static void main(String[] args) {
+System.out.println(“Hello from Jenkins CI”); } }
+
+3.  Commit the file to the main branch.
+
+B. Create a Jenkins job 1. Open Jenkins. 2. Select New Item, enter a job
+name, select Freestyle project, and click OK. 3. Under Source Code
+Management, select Git. 4. Paste your GitHub repository URL. 5. Set the
+branch specifier to */main (use the actual branch name if different). 6.
+Under Build Triggers, select GitHub hook trigger for GITScm polling if
+configured.
+
+C. Configure the build step Under Build Steps, choose Execute Windows
+batch command and enter:
+
+java -version javac Simple.java java Simple
+
+This requires a JDK (not just a JRE) to be installed on the Jenkins
+machine and Java to be available in PATH.
+
+If Jenkins runs on Linux, choose Execute shell instead and use the same
+three commands.
+
+D. Save and build 1. Click Save. 2. Click Build Now. 3. Open the build’s
+Console Output. 4. Confirm that the output includes: Hello from Jenkins
+CI
+
+If GitHub webhook triggering is required, configure a webhook in the
+GitHub repository pointing to your Jenkins server’s webhook endpoint.
+The Jenkins server must be reachable from GitHub; localhost alone will
+not work for an external webhook.
+
+============================================================ EXPERIMENT
+5: SLACK NOTIFICATION FROM JENKINS
+============================================================
+
+A. Prepare Slack 1. Sign in to Slack. 2. Create or select a workspace
+and create a channel, for example: #devops-5. 3. In Jenkins, open Manage
+Jenkins > Plugins and install/enable the Slack Notification plugin if it
+is not already installed.
+
+B. Configure Slack in Jenkins 1. Open Manage Jenkins > System. 2. Find
+the Slack section. 3. Configure the workspace/team and Slack
+credential/token as required by your plugin version. 4. Save the
+configuration. 5. Use Test Connection if available.
+
+C. Add the Slack credential 1. In Jenkins, open Manage Jenkins >
+Credentials. 2. Add the credential type required by the installed Slack
+plugin (commonly Secret text for a Slack token). 3. Give it an ID and
+save it. 4. Select that credential in the Slack configuration.
+
+D. Configure the job 1. Open your Freestyle job and select Configure. 2.
+Find the Slack notification/post-build section (the exact location
+depends on plugin version). 3. Select the configured credential and set
+the target channel to the channel created above. 4. Enable notifications
+for the required build results, such as success and failure. 5. Save and
+click Build Now.
+
+E. Verify 1. Open the Jenkins build’s Console Output and check for Slack
+notification errors. 2. Open the Slack channel and verify that a message
+appears for the build result.
+
+IMPORTANT: - The PDF’s handwritten Slack setup refers to
+workspace/channel configuration, a secret-text credential, and testing
+the connection. The exact screens can differ by Jenkins and Slack plugin
+versions. - Never paste a Slack token into a public repository or share
+it in screenshots. - Slack notifications require a valid Slack app/bot
+token and permission to post in the chosen channel; a workspace name
+alone is not sufficient.
+
+END OF EXPERIMENTS 1-5
